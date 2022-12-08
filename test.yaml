@@ -1,0 +1,10 @@
+elements:
+  products:
+    type: post
+    multilang: true
+  page:
+    type: post
+    multilang: true
+  rooms:
+    type: tax
+    multilang: false
