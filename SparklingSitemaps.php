@@ -1,186 +1,79 @@
 <?php
 
 namespace Lib\SparklingSitemaps;
-// use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Yaml;
 
 class SparklingSitemaps {
     
-    // $value = Yaml::parseFile(  __DIR__.'/test.yaml' );
 
     const POST_TYPE_PAGE        = 'page';
-    const POST_TYPE_NEWS        = 'news';
-    const POST_TYPE_LANDING     = 'post';
-    const POST_TYPE_LIFESTYLE   = 'lifestyle';
-    const POST_TYPE_DESIGNER    = 'designer';
-    const POST_TYPE_PRODUCTS    = 'products';
-    const POST_TYPE_CONTRACTS   = 'contract';
-
-    const TAX_COLLECTIONS       = 'rooms';
-    const TAX_TYPOLOGIES        = 'design';
+    const POST_TYPE_POST        = 'post';
 
     function __construct( $querVars ) {
+        $this->node       = $querVars['node'] ?: null;
+        $this->acceptTypes = ['tax','post_type'];
 
-    $this->node       = $querVars['nodo'] ?: null;
-    $this->tipologia  = $querVars['tipologia'] ?: null;
-
-    $this->acceptTypes = ['tax','post'];
-
-    $this->isWpml = defined('ICL_LANGUAGE_CODE');
+        $this->isWpml = defined('ICL_LANGUAGE_CODE');
     }
 
     public function matchQueryString() {
     
-    if( !$this->node ) return;
+        if( !$this->node ) return;
 
-    switch( $this->node ) {
+        // $nodes = Yaml::parseFile(  __DIR__.'/nodes.yaml' );
+
+        // var_dump( $nodes );
+
+        switch( $this->node ) {
     
-        case 'contracts' :
 
-            $this->post_type = self::POST_TYPE_CONTRACTS;
-            $this->type = 'post';
-            $this->changefreq = 'monthly';
-            $this->priority = 0.4;
+            case 'post' :
 
-            $this->data = [
-                'post_type'       => $this->post_type,
-                'post_status'     => 'publish',
-                'posts_per_page'  => -1,
-                'post_parent'     => 0,
-                'order'           => 'DESC',
-            ];
+                $this->post_type = self::POST_TYPE_POST;
+                $this->type = 'post';
+                $this->changefreq = 'weekly';
+                $this->priority = 0.6;
 
-            break;
+                $this->data = [
+                    'post_type'       => $this->post_type,
+                    'post_status'     => 'publish',
+                    'posts_per_page'  => -1,
+                    'post_parent'     => 0,
+                    'order'           => 'DESC',
+                ];
 
-        case 'designer' :
+                break;
 
-            $this->post_type = self::POST_TYPE_DESIGNER;
-            $this->type = 'post';
-            $this->changefreq = 'monthly';
-            $this->priority = 0.2;
+            case 'page' :
 
-            $this->data = [
-                'post_type'       => $this->post_type,
-                'post_status'     => 'publish',
-                'posts_per_page'  => -1,
-                'post_parent'     => 0,
-                'order'           => 'DESC',
-            ];
-
-            break;
-
-        case 'lifestyle' :
-
-            $this->post_type = self::POST_TYPE_LIFESTYLE;
-            $this->type = 'post';
-            $this->changefreq = 'monthly';
-            $this->priority = 0.4;
-
-            $this->data = [
-                'post_type'       => $this->post_type,
-                'post_status'     => 'publish',
-                'posts_per_page'  => -1,
-                'post_parent'     => 0,
-                'order'           => 'DESC',
-            ];
-
-            break;
-
-        case 'news' :
-
-            $this->post_type = self::POST_TYPE_NEWS;
-            $this->type = 'post';
-            $this->changefreq = 'weekly';
-            $this->priority = 0.6;
-
-            $this->data = [
-                'post_type'       => $this->post_type,
-                'post_status'     => 'publish',
-                'posts_per_page'  => -1,
-                'post_parent'     => 0,
-                'order'           => 'DESC',
-            ];
-
-            break;
+                $this->post_type = self::POST_TYPE_PAGE;
+                $this->type = 'post';
+                $this->changefreq = 'weekly';
+                $this->priority = 0.6;
         
-        case 'landing' :
-
-            $this->post_type = self::POST_TYPE_LANDING;
-            $this->type = 'post';
-            $this->changefreq = 'weekly';
-            $this->priority = 0.8;
-
-            $this->data = [
-                'post_type'       => $this->post_type,
-                'post_status'     => 'publish',
-                'posts_per_page'  => -1,
-                'post_parent'     => 0,
-                'order'           => 'DESC',
-            ];
-
-            break;
+                $this->data = [
+                    'post_type'       => $this->post_type,
+                    'post_status'     => 'publish',
+                    'posts_per_page'  => -1,
+                    'post_parent'     => 0,
+                    'order'           => 'DESC',
+                ];
         
-        case 'prodotti' :
+                break;
+            
+            // case 'typologies' :
 
-            $this->post_type = self::POST_TYPE_PRODUCTS;
-            $this->type = 'post';
-            $this->changefreq = 'weekly';
-            $this->priority = 1;
+            //     $this->post_type = self::TAX_TYPOLOGIES;
+            //     $this->type = 'tax';
+            //     $this->changefreq = 'monthly';
+            //     $this->priority = 0.8;
 
-            $this->data = [
-                'post_type'       => $this->post_type,
-                'post_status'     => 'publish',
-                'posts_per_page'  => -1,
-                'post_parent'     => 0,
-                'order'           => 'DESC',
-            ];
+            //     $this->data = [
+            //         'taxonomy'       => $this->post_type,
+            //         'hide_empty'     => true
+            //     ];
 
-
-            break;
-        
-        case 'pagine' :
-
-            $this->post_type = self::POST_TYPE_PAGE;
-            $this->type = 'post';
-            $this->changefreq = 'weekly';
-            $this->priority = 0.6;
-
-            $this->data = [
-                'post_type'       => $this->post_type,
-                'post_status'     => 'publish',
-                'posts_per_page'  => -1,
-                'post_parent'     => 0,
-                'order'           => 'DESC',
-            ];
-
-            break;
-
-        case 'collections' :
-
-            $this->post_type = self::TAX_COLLECTIONS;
-            $this->type = 'tax';
-            $this->changefreq = 'monthly';
-            $this->priority = 0.8;
-
-            $this->data = [
-                'taxonomy'       => $this->post_type,
-                'hide_empty'     => true
-            ];
-
-            break;
-
-        case 'typologies' :
-
-            $this->post_type = self::TAX_TYPOLOGIES;
-            $this->type = 'tax';
-            $this->changefreq = 'monthly';
-            $this->priority = 0.8;
-
-            $this->data = [
-                'taxonomy'       => $this->post_type,
-                'hide_empty'     => true
-            ];
-
-            break;
+            //     break;
 
         }
 
@@ -227,17 +120,14 @@ class SparklingSitemaps {
 
         $data = [];
 
-        $query = new WP_Query( $this->data );
+        $query = new \WP_Query( $this->data );
 
         if( $query->have_posts() ) :
             while($query->have_posts()) :
                 $query->the_post();
                 global $post;
 
-                $hasPrefix = in_array( $post_type, [ self::POST_TYPE_PRODUCTS, self::POST_TYPE_NEWS, self::POST_TYPE_LIFESTYLE, self::POST_TYPE_DESIGNER ] );
-                $prefix = getPostTypeSlug( $this->post_type );
-                $url = $hasPrefix ? get_bloginfo('url').'/'.$prefix.'/'.$post->post_name : get_bloginfo('url').$post->post_name;
-
+                $url = get_permalink( $post->ID );
                 $lastmod = get_the_modified_date('Y-m-d\Th:m:s+00:00', $post->ID );
 
                 $urlTranslated = [];
@@ -247,7 +137,6 @@ class SparklingSitemaps {
                 $translations = apply_filters('wpml_get_element_translations', [], apply_filters('wpml_element_trid', false, $post->ID, $post_type), $post_type);      
 
                 unset( $translations[ ICL_LANGUAGE_CODE ] );
-                if( $this->data['post_type'] == 'news' ) unset( $translations[ 'zh-hans' ] ); # TODO: da migliorare
                 
                 foreach( $translations as $lang => $trans ) {
                     $urlTranslated[$lang] = get_permalink($trans->element_id);
@@ -255,9 +144,9 @@ class SparklingSitemaps {
                 endif;
 
                 array_push( $data, [
-                'loc' => $url,
-                'lastmod' => $lastmod,
-                'alternate' => $urlTranslated
+                    'loc' => $url,
+                    'lastmod' => $lastmod,
+                    'alternate' => $urlTranslated
                 ]);
 
                 wp_reset_postdata();

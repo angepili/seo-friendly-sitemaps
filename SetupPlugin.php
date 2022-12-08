@@ -6,7 +6,6 @@ class SparklingSitempaPlugin {
     public function __construct() {
         add_action('init', [&$this, 'rewrites']);
         add_filter('template_include', [&$this, 'template' ]);
-
     }
 
     public function rewrites() {
