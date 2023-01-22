@@ -1,21 +1,22 @@
 <?php
 /**
-* Plugin Name: Sparkling Sitemaps
-* Plugin URI: https://www.socialidea.it
+* Plugin Name: SEO Friendly sitemaps
+* Plugin URI: https://github.com/angepili
 * Description: Generate sitemap super Google friendly
 * Version: 1.0
 * Requires PHP: 7.4
-* Author: Socialidea
-* Author URI:  https://www.socialidea.it
+* Author: Angelo Pili
+* Author URI:  https://github.com/angepili
 */
 
 array_map( fn( $file ) =>  
     include_once( __DIR__ . $file )
 ,[
     '/vendor/autoload.php',
-    '/SparklingSitemaps.php',
-    '/SetupPlugin.php',
+    '/Lib/Hooks.php',
+    '/Lib/SitemapConfigs.php',
+    '/Lib/SitemapClass.php',
 ]);
 
-use Lib\Setup\SparklingSitempaPlugin;
-( new SparklingSitempaPlugin() );
+use Lib\Hooks;
+( new Hooks() );

@@ -1,16 +1,12 @@
 <?php
 
-namespace Lib\SparklingSitemaps;
-use Symfony\Component\Yaml\Yaml;
+namespace Lib;
+use Lib\SitemapCongigs;
 
-class SparklingSitemaps {
+class SitemapClass {
     
-
-    const POST_TYPE_PAGE        = 'page';
-    const POST_TYPE_POST        = 'post';
-
-    function __construct( $querVars ) {
-        $this->node       = $querVars['node'] ?: null;
+    function __construct( $querVars = null ) {
+        $this->node        = $querVars['node'] ?: null;
         $this->acceptTypes = ['tax','post_type'];
 
         $this->isWpml = defined('ICL_LANGUAGE_CODE');
@@ -20,62 +16,16 @@ class SparklingSitemaps {
     
         if( !$this->node ) return;
 
-        // $nodes = Yaml::parseFile(  __DIR__.'/nodes.yaml' );
+        $nodes = ( new SitemapConfigs )->getData();
 
-        // var_dump( $nodes );
-
-        switch( $this->node ) {
-    
-
-            case 'post' :
-
-                $this->post_type = self::POST_TYPE_POST;
-                $this->type = 'post';
-                $this->changefreq = 'weekly';
-                $this->priority = 0.6;
-
-                $this->data = [
-                    'post_type'       => $this->post_type,
-                    'post_status'     => 'publish',
-                    'posts_per_page'  => -1,
-                    'post_parent'     => 0,
-                    'order'           => 'DESC',
-                ];
-
-                break;
-
-            case 'page' :
-
-                $this->post_type = self::POST_TYPE_PAGE;
-                $this->type = 'post';
-                $this->changefreq = 'weekly';
-                $this->priority = 0.6;
+        $this->type = $nodes[ $this->node ]['type'];
+        $this->changefreq = $nodes[ $this->node ]['changefreq'];
+        $this->priority = $nodes[ $this->node ]['priority'];
         
-                $this->data = [
-                    'post_type'       => $this->post_type,
-                    'post_status'     => 'publish',
-                    'posts_per_page'  => -1,
-                    'post_parent'     => 0,
-                    'order'           => 'DESC',
-                ];
-        
-                break;
-            
-            // case 'typologies' :
+        unset( $nodes[ $this->node ]['changefreq'] );
+        unset( $nodes[ $this->node ]['priority'] );
 
-            //     $this->post_type = self::TAX_TYPOLOGIES;
-            //     $this->type = 'tax';
-            //     $this->changefreq = 'monthly';
-            //     $this->priority = 0.8;
-
-            //     $this->data = [
-            //         'taxonomy'       => $this->post_type,
-            //         'hide_empty'     => true
-            //     ];
-
-            //     break;
-
-        }
+        $this->data = $nodes[ $this->node ];
 
     }
 
@@ -106,8 +56,8 @@ class SparklingSitemaps {
 
 
             array_push( $data, [
-            'loc' => $url,
-            'alternate' => $urlTranslate
+                'loc' => $url,
+                'alternate' => $urlTranslate
             ]);
 
         }
@@ -159,19 +109,19 @@ class SparklingSitemaps {
 
     public function xmlBody( $item ) {
 
-        $xml = '<url>';
-            $xml .= '<loc>'.$item['loc'].'</loc>';
-            if( $item['lastmod'] ) $xml .= '<lastmod>'.$item['lastmod'].'</lastmod>';
-            $xml .= '<changefreq>'.$this->changefreq.'</changefreq>';
-            $xml .= '<priority>'.$this->priority.'</priority>';
+        $xml = '<url>'."\n";
+            $xml .= '<loc>'.$item['loc'].'</loc>'."\n";
+            if( $item['lastmod'] ) $xml .= '<lastmod>'.$item['lastmod'].'</lastmod>'."\n";
+            $xml .= '<changefreq>'.$this->changefreq.'</changefreq>'."\n";
+            $xml .= '<priority>'.$this->priority.'</priority>'."\n";
 
             if( $item['alternate'] && count( $item['alternate'] ) >= 1 ) {
-            foreach( $item['alternate']  as $lang => $link ) {
-                $xml .= '<xhtml:link rel="alternate" hreflang="'.$lang.'" href="'.$link.'" />';
-            }
+                foreach( $item['alternate']  as $lang => $link ) {
+                    $xml .= '<xhtml:link rel="alternate" hreflang="'.$lang.'" href="'.$link.'" />'."\n";
+                }
             }
 
-        $xml .= '</url>';
+        $xml .= '</url>'."\n";
 
         return $xml;
 
@@ -181,15 +131,14 @@ class SparklingSitemaps {
     public function getSitemap() {
     
         $this->matchQueryString();
-
+        
         if( !$this->type || $this->type && !in_array( $this->type, $this->acceptTypes  ) ) return;
-
+        
         $this->data = $this->type === 'tax' ? $this->getTaxData() : $this->getPostData();
 
-        $xml = '
-        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        $xml = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
+            xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">'."\n";
 
         foreach( $this->data as $item ) {
             $xml .= $this->xmlBody( $item );
